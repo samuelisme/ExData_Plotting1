@@ -1,0 +1,45 @@
+#Read text file
+df<-read.csv("data/household_power_consumption.txt",sep=";", header=TRUE, stringsAsFactors=FALSE, na.strings = "?")
+
+#Convert the first column to Date class
+df$Date<-as.Date(df$Date,format="%d/%m/%Y")
+
+#Subset the data frame to match the given date range
+date.start=as.Date("2007-02-01")
+date.end=as.Date("2007-02-02")
+df2<-df[df$Date == date.start | df$Date == date.end,]
+
+#Strip date time
+date.time <-strptime(paste(df2$Date,df2$Time), format="%Y-%m-%d %H:%M:%S")
+
+png("plot4.png",  width = 480, height = 480, units = "px")
+
+#Set par because we want 4 graphs put together
+par(mfrow = c(2,2))
+
+#Plot 1. Extract Global Active Power data and plot graph
+global.active.power<-as.numeric(df2$Global_active_power)
+plot(date.time, global.active.power, type="l", xlab="", ylab="Global Active Power")
+
+#Plot 2. Extract voltage and plot graph
+#Power<-as.numeric(df2$Global_active_power)
+voltage<-as.numeric(df2$Voltage)
+plot(date.time, voltage, type="l", xlab="datetime", ylab="Global Active Power")
+
+#Plot 3. Extract sub meter 1, 2 3, plot graph and add a legend
+meter1<-as.numeric(df2$Sub_metering_1)
+meter2<-as.numeric(df2$Sub_metering_2)
+meter3<-as.numeric(df2$Sub_metering_3)
+
+plot(date.time, meter1 ,type="l",xlab="",ylab="Energy sub metering")
+points(date.time, meter2 ,type="l",col="red")
+points(date.time, meter3 ,type="l",col="blue")
+
+legend("topright", lty=1, col=c("black","red","blue"), legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_2"))
+
+#Plot 4. Extract Global Active Power data and plot graph
+global.reactive.power <-df2$Global_reactive_power
+plot(date.time, global.reactive.power, type="l", xlab="datetime", ylab="Global_reactive_power")
+
+dev.off()
+
